@@ -1,5 +1,6 @@
 import tkinter as tk
 import tkinter.font as tkFont
+from tkinter import messagebox
 from qr_reader import get_data_from_qr
 
 
@@ -92,14 +93,14 @@ class GUI_UDI:
 
 
     def on_continue(self):
-        qr_data = get_data_from_qr()
-        print("Datos del QR: " + qr_data)
-        service = self.service_var.get()
-        print("Servicio solicitado: " + service)
-        if service == "Préstamo de control.":
-            print("Salón del control prestado:\t" + self.classroom_control_var.get())
-        elif service == "Préstamo de cañón.":
-            print("Número del cañón prestado:\t" + self.projector_number_var.get())
+        qr_data = "Datos del QR: " + get_data_from_qr()
+        service = "Servicio solicitado: \t" + self.service_var.get() 
+        if self.service_var.get() == "Préstamo de control.":
+            messagebox.showinfo(title="Datos recopilados",message=qr_data + "\n" + service + "\nSalón del control prestado:\t" + self.classroom_control_var.get())
+        elif self.service_var.get() == "Préstamo de cañón.":
+            messagebox.showinfo(title="Datos recopilados",message=qr_data + "\n" + service + "\nNúmero del cañón prestado:\t" + self.projector_number_var.get())
+        else:
+            messagebox.showinfo(title="Datos recopilados",message=qr_data + "\n" + service)
 
 
     def on_dropdown_changed(self, *args):
