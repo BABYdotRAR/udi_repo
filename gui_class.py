@@ -1,18 +1,21 @@
 import tkinter as tk
+import tkinter.font as tkFont
+from qr_reader import get_data_from_qr
+
 
 class GUI_UDI:
 
     def __init__(self):
-
         self.root = tk.Tk()
 
-        self.root.title("UDI ESIT")
-        self.root.geometry("800x600")
+        self.config_root()
+
+        self.gothic_ui_14_font = tkFont.Font(family='Yu Gothic UI Light', size=14)
 
         self.welcome_label = tk.Label(
             self.root,
             text="Bienvenido de nuevo, por favor selecciona una opción",
-            font=('Yu Gothic UI Light', 14)
+            font=self.gothic_ui_14_font
         )
         self.welcome_label.pack(padx=10, pady=10)
 
@@ -31,13 +34,13 @@ class GUI_UDI:
             "Préstamo de cañón.", 
             "Préstamo de control."
         )
-        self.service_dropdown.config(font=('Yu Gothic UI Light', 14))
+        self.service_dropdown.config(font=self.gothic_ui_14_font)
         self.service_dropdown.grid(row=1, column=0, sticky=tk.W+tk.E)
 
         self.control_label = tk.Label(
             self.form_frame,
             text="Seleccione el control a prestar:",
-            font=('Yu Gothic UI Light', 14)
+            font=self.gothic_ui_14_font
         )
         self.classroom_control_dropdown = tk.OptionMenu(
             self.form_frame, 
@@ -46,12 +49,12 @@ class GUI_UDI:
             "E-202", 
             "Lab 2"
         )
-        self.classroom_control_dropdown.config(font=('Yu Gothic UI Light', 14))
+        self.classroom_control_dropdown.config(font=self.gothic_ui_14_font)
 
         self.projector_label = tk.Label(
             self.form_frame,
             text="Seleccione el número de cañón a prestar:",
-            font=('Yu Gothic UI Light', 14)
+            font=self.gothic_ui_14_font
         )
         self.projector_number_dropdown = tk.OptionMenu(
             self.form_frame, 
@@ -60,19 +63,25 @@ class GUI_UDI:
             "2", 
             "3"
         )
-        self.projector_number_dropdown.config(font=('Yu Gothic UI Light', 14))
+        self.projector_number_dropdown.config(font=self.gothic_ui_14_font)
 
         self.form_frame.pack(padx=10, pady=10)
 
         self.continue_btn = tk.Button(
             self.root, 
             text="Siguiente", 
-            font=('Yu Gothic UI Light', 14),
+            font=self.gothic_ui_14_font,
             command=self.on_continue
         )
         self.continue_btn.pack(padx=20, pady=20)
 
         self.root.mainloop()
+
+
+    def config_root(self):
+        self.root.title("UDI ESIT")
+        self.root.geometry("800x600")
+
 
     def init_string_vars(self):
         self.service_var = tk.StringVar()
@@ -81,10 +90,17 @@ class GUI_UDI:
         self.classroom_control_var = tk.StringVar()
         self.projector_number_var = tk.StringVar()
 
+
     def on_continue(self):
-        print(self.service_var.get())
-        print(self.classroom_control_var.get())
-        print(self.projector_number_var.get())
+        qr_data = get_data_from_qr()
+        print("Datos del QR: " + qr_data)
+        service = self.service_var.get()
+        print("Servicio solicitado: " + service)
+        if service == "Préstamo de control.":
+            print("Salón del control prestado:\t" + self.classroom_control_var.get())
+        elif service == "Préstamo de cañón.":
+            print("Número del cañón prestado:\t" + self.projector_number_var.get())
+
 
     def on_dropdown_changed(self, *args):
         option = self.service_var.get()
