@@ -10,7 +10,7 @@ def get_data_from_qr():
         if len(data) > 0:
             qr_data = data
             break
-        cv2.imshow('Please show a qr code to the cam.', frame)
+        cv2.imshow('Por favor enseña un código QR a la cámara.', frame)
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
     vid.release()
