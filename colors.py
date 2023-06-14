@@ -1,0 +1,5 @@
+grey = "#5D5A58"
+dark_grey = "#4C4A48"
+white = "#FFFFFF"
+aqua = "#038387"
+blue = "#0063B1"
