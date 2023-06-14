@@ -1,7 +1,9 @@
 import tkinter as tk
 from tkinter import font
 from tkinter import messagebox
+
 from qr_reader import get_data_from_qr
+import colors as color
 
 
 class GUI_UDI:
@@ -18,8 +20,8 @@ class GUI_UDI:
             self.root,
             text="Bienvenido de nuevo, por favor selecciona una opción",
             font=self.gothic_ui_16_font,
-            fg="white",
-            bg="#4C4A48"
+            fg=color.white,
+            bg=color.dark_grey
         )
         self.welcome_label.pack(padx=10, pady=10)
 
@@ -35,8 +37,9 @@ class GUI_UDI:
             self.root, 
             text="Siguiente", 
             font=self.gothic_ui_light_14_font,
-            bg="#038387",
-            fg="white",
+            bg=color.aqua,
+            fg=color.white, 
+            borderwidth=0,
             command=self.on_continue
         )
         self.continue_btn.pack(side="right", padx=20, pady=20)
@@ -47,11 +50,11 @@ class GUI_UDI:
     def config_root(self):
         self.root.title("UDI ESIT")
         self.root.geometry("800x600")
-        self.root.config(bg="#4C4A48")
+        self.root.config(bg=color.dark_grey)
 
 
     def config_form_frame(self):
-        self.form_frame.config(bg="#4C4A48")
+        self.form_frame.config(bg=color.dark_grey)
         self.form_frame.columnconfigure(0, weight=1)
         self.form_frame.columnconfigure(1, weight=1)
         self.form_frame.columnconfigure(2, weight=1)
@@ -73,8 +76,8 @@ class GUI_UDI:
             self.form_frame,
             text="Seleccione el servicio solicitado:",
             font=self.gothic_ui_light_14_font,
-            fg="white",
-            bg="#4C4A48"
+            fg=color.white,
+            bg=color.dark_grey
         )
         self.service_label.grid(row=0, column=0, sticky=tk.W+tk.E)
         self.service_dropdown = tk.OptionMenu(
@@ -84,15 +87,15 @@ class GUI_UDI:
             "Préstamo de cañón.", 
             "Préstamo de control."
         )
-        self.service_dropdown.config(font=self.gothic_ui_light_14_font, bg="#0063B1", fg="white")
+        self.service_dropdown.config(font=self.gothic_ui_light_14_font, bg=color.blue, fg=color.white, borderwidth=0)
         self.service_dropdown.grid(row=1, column=0, sticky=tk.W+tk.E)
 
         self.control_label = tk.Label(
             self.form_frame,
             text="Seleccione el control a prestar:",
             font=self.gothic_ui_light_14_font,
-            fg="white",
-            bg="#4C4A48"
+            fg=color.white,
+            bg=color.dark_grey
         )
         self.classroom_control_dropdown = tk.OptionMenu(
             self.form_frame, 
@@ -101,14 +104,14 @@ class GUI_UDI:
             "E-202", 
             "Lab 2"
         )
-        self.classroom_control_dropdown.config(font=self.gothic_ui_light_14_font, bg="#0063B1", fg="white")
+        self.classroom_control_dropdown.config(font=self.gothic_ui_light_14_font, bg=color.blue, fg=color.white, borderwidth=0)
 
         self.projector_label = tk.Label(
             self.form_frame,
             text="Seleccione el número de cañón a prestar:",
             font=self.gothic_ui_light_14_font,
-            fg="white",
-            bg="#4C4A48"
+            fg=color.white,
+            bg=color.dark_grey
         )
         self.projector_number_dropdown = tk.OptionMenu(
             self.form_frame, 
@@ -117,7 +120,7 @@ class GUI_UDI:
             "2", 
             "3"
         )
-        self.projector_number_dropdown.config(font=self.gothic_ui_light_14_font, bg="#0063B1", fg="white")
+        self.projector_number_dropdown.config(font=self.gothic_ui_light_14_font, bg=color.blue, fg=color.white, borderwidth=0)
 
 
     def on_continue(self):
