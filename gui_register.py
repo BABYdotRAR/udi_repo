@@ -6,6 +6,7 @@ from tkinter import messagebox
 from qr_generator import create_img
 from whatsapp_handler import send_img
 import colors as color
+import string_validator as str_val
 
 class register_GUI:
     def __init__(self):
@@ -120,16 +121,42 @@ class register_GUI:
         self.id =tk.StringVar()
 
     def on_register(self):
+        err_msg = self.validate_entries()
         qr_data = self.id.get()
 
-        if qr_data == "":
-            messagebox.showerror(title="Datos incompletos", message="Ingrese una boleta.")
+        if err_msg != "":
+            messagebox.showerror(title="Datos incompletos", message="Atienda lo que se solicita:\n"+err_msg)
         else:
             create_img(qr_data, qr_data)
             path = "ABSOLUTE_PATH" + qr_data + ".jpg"
             number = "+52XXXXXX"
             send_img(path, number)
             messagebox.showinfo(title="QR Creado y enviado", message="Se ha creado exitosamente el QR y enviado")
+    
+    def validate_entries(self):
+        _id = self.id.get()
+        _phone_number = self.phone_number.get()
+        _name = self.name.get()
+        _last_name = self.lastname.get()
+
+        _id_flag = _id == ""
+        _phone_number_flag = str_val.contains_only_numbers(_phone_number) == False
+        _name_flag = str_val.has_no_numbers_or_special_chars(_name) == False
+        _last_name_flag = str_val.has_no_numbers_or_special_chars(_last_name) == False
+
+        err_msg = ""
+        if _id_flag:
+            err_msg = err_msg + "Boleta: introduzca un valor.\n"
+        if _phone_number_flag:
+            err_msg = err_msg + "Teléfono: inserte un número válido.\n"
+        if _name_flag:
+            err_msg = err_msg + "Nombre: ingrese un nombre válido.\n"
+        if _last_name_flag:
+            err_msg = err_msg + "Apellido: ingrese un apellido válido."
+        
+        return err_msg
+
+
         
 
 register_GUI()
