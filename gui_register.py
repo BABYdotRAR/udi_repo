@@ -8,6 +8,7 @@ from whatsapp_handler import send_img
 import colors as color
 import string_validator as str_val
 import env_variables as env
+import db_driver as db
 
 class register_GUI:
     def __init__(self):
@@ -110,16 +111,19 @@ class register_GUI:
         self.root.title("Registro alumno.")
         self.root.config(bg=color.dark_grey)
 
+
     def config_frame(self):
         self.register_frame.columnconfigure(0, weight=1)
         self.register_frame.columnconfigure(1, weight=1)
         self.register_frame.config(bg=color.dark_grey)
+
 
     def init_string_vars(self):
         self.name = tk.StringVar()
         self.lastname = tk.StringVar()
         self.phone_number = tk.StringVar()
         self.id =tk.StringVar()
+
 
     def on_register(self):
         err_msg = self.validate_entries()
@@ -133,8 +137,9 @@ class register_GUI:
             path = env.PROJECT_PATH + "\\img\\" + qr_data + ".jpg"
             number = "+52" + _phone_number
             send_img(path, number)
-            messagebox.showinfo(title="QR Creado y enviado", message="Se ha creado exitosamente el QR y enviado")
+            self.insert_user()
     
+
     def validate_entries(self):
         _id = self.id.get()
         _phone_number = self.phone_number.get()
@@ -157,8 +162,26 @@ class register_GUI:
             err_msg = err_msg + "Apellido: ingrese un apellido válido."
         
         return err_msg
+    
 
+    def insert_user(self):
+        _id = self.id.get()
+        _phone_number = self.phone_number.get()
+        _name = self.name.get()
+        _last_name = self.lastname.get()
 
-        
+        params = {"id": _id, "name":_name, "lastname":_last_name, "phone":_phone_number}
+
+        driver = db.DB_Driver()
+        query_result = driver.create_new_user(params)
+
+        if query_result == "OK":
+            messagebox.showinfo(title="Usuario registrado", 
+                                message="Usuario registrado correctamente, su código QR ha sido enviado al teléfono proporcionado.")
+        else:
+            messagebox.showerror(title="Error en el registro", message=query_result)
+
+        driver.close_connection()
+
 
 register_GUI()
