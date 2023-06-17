@@ -2,3 +2,4 @@
 *.jpg
 test.py
 PyWhatKit_DB.txt
+.env

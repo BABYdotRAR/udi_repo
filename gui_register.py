@@ -7,6 +7,7 @@ from qr_generator import create_img
 from whatsapp_handler import send_img
 import colors as color
 import string_validator as str_val
+import env_variables as env
 
 class register_GUI:
     def __init__(self):
@@ -123,13 +124,14 @@ class register_GUI:
     def on_register(self):
         err_msg = self.validate_entries()
         qr_data = self.id.get()
+        _phone_number = self.phone_number.get()
 
         if err_msg != "":
             messagebox.showerror(title="Datos incompletos", message="Atienda lo que se solicita:\n"+err_msg)
         else:
             create_img(qr_data, qr_data)
-            path = "ABSOLUTE_PATH" + qr_data + ".jpg"
-            number = "+52XXXXXX"
+            path = env.PROJECT_PATH + "\\img\\" + qr_data + ".jpg"
+            number = "+52" + _phone_number
             send_img(path, number)
             messagebox.showinfo(title="QR Creado y enviado", message="Se ha creado exitosamente el QR y enviado")
     

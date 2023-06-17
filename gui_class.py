@@ -4,6 +4,7 @@ from tkinter import messagebox
 
 from qr_reader import get_data_from_qr
 import colors as color
+import db_driver as db
 
 
 class GUI_UDI:
@@ -12,6 +13,7 @@ class GUI_UDI:
         self.root = tk.Tk()
 
         self.config_root()
+        self.driver = db.DB_Driver()
 
         self.gothic_ui_light_14_font = font.Font(family='Yu Gothic UI Light', size=14)
         self.gothic_ui_16_font = font.Font(family='Yu Gothic UI', size=16)
@@ -62,13 +64,13 @@ class GUI_UDI:
 
     def init_string_vars(self):
         self.service_var = tk.StringVar()
-        self.service_var.set("Préstamo de computadora.")
+        self.service_var.set("Escoja una opción")
         self.service_var.trace("w", self.on_dropdown_changed)
 
         self.classroom_control_var = tk.StringVar()
-        self.classroom_control_var.set("102")
+        self.classroom_control_var.set("Escoja una opción")
         self.projector_number_var = tk.StringVar()
-        self.projector_number_var.set("1")
+        self.projector_number_var.set("Escoja una opción")
 
 
     def init_dropdowns(self):
@@ -80,12 +82,11 @@ class GUI_UDI:
             bg=color.dark_grey
         )
         self.service_label.grid(row=0, column=0, sticky=tk.W+tk.E)
+        self.services_dict = {"Préstamo de computadora":1, "Préstamo de proyector":2, "Préstamo de control remoto":3}
         self.service_dropdown = tk.OptionMenu(
             self.form_frame, 
             self.service_var, 
-            "Préstamo de computadora.", 
-            "Préstamo de cañón.", 
-            "Préstamo de control."
+            *self.services_dict.keys()
         )
         self.service_dropdown.config(font=self.gothic_ui_light_14_font, bg=color.blue, fg=color.white, borderwidth=0)
         self.service_dropdown.grid(row=1, column=0, sticky=tk.W+tk.E)
@@ -97,12 +98,12 @@ class GUI_UDI:
             fg=color.white,
             bg=color.dark_grey
         )
+        self.rmt_ctrls_list = self.driver.get_remote_controls()
+        self.rmt_ctrls_dict = dict(self.rmt_ctrls_list)
         self.classroom_control_dropdown = tk.OptionMenu(
             self.form_frame, 
             self.classroom_control_var, 
-            "102", 
-            "E-202", 
-            "Lab 2"
+            *self.rmt_ctrls_dict.keys()
         )
         self.classroom_control_dropdown.config(font=self.gothic_ui_light_14_font, bg=color.blue, fg=color.white, borderwidth=0)
 
@@ -113,12 +114,11 @@ class GUI_UDI:
             fg=color.white,
             bg=color.dark_grey
         )
+        self.projectors = self.driver.get_projectors()
         self.projector_number_dropdown = tk.OptionMenu(
             self.form_frame, 
             self.projector_number_var, 
-            "1", 
-            "2", 
-            "3"
+            *self.projectors
         )
         self.projector_number_dropdown.config(font=self.gothic_ui_light_14_font, bg=color.blue, fg=color.white, borderwidth=0)
 
@@ -126,9 +126,9 @@ class GUI_UDI:
     def on_continue(self):
         qr_data = "Datos del QR: " + get_data_from_qr()
         service = "Servicio solicitado: \t" + self.service_var.get() 
-        if self.service_var.get() == "Préstamo de control.":
+        if self.service_var.get() == "Préstamo de control remoto":
             messagebox.showinfo(title="Datos recopilados",message=qr_data + "\n" + service + "\nSalón del control prestado:\t" + self.classroom_control_var.get())
-        elif self.service_var.get() == "Préstamo de cañón.":
+        elif self.service_var.get() == "Préstamo de proyector":
             messagebox.showinfo(title="Datos recopilados",message=qr_data + "\n" + service + "\nNúmero del cañón prestado:\t" + self.projector_number_var.get())
         else:
             messagebox.showinfo(title="Datos recopilados",message=qr_data + "\n" + service)
@@ -137,13 +137,13 @@ class GUI_UDI:
     def on_dropdown_changed(self, *args):
         option = self.service_var.get()
 
-        if option == "Préstamo de cañón.":
+        if option == "Préstamo de proyector":
             self.projector_label.grid(row=2, column=1, sticky=tk.W+tk.E)
             self.projector_number_dropdown.grid(row=2, column=2, sticky=tk.W+tk.E)
 
             self.control_label.grid_forget()
             self.classroom_control_dropdown.grid_forget()
-        elif option == "Préstamo de control.":
+        elif option == "Préstamo de control remoto":
             self.control_label.grid(row=2, column=1, sticky=tk.W+tk.E)
             self.classroom_control_dropdown.grid(row=2, column=2, sticky=tk.W+tk.E)
 
@@ -157,4 +157,3 @@ class GUI_UDI:
 
 
 GUI_UDI()
-
