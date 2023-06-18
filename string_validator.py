@@ -17,3 +17,9 @@ def has_no_numbers_or_special_chars(string):
         if not char.isalpha() and char not in allowed_characters:
             return False
     return True
+
+
+def extract_number(string):
+    number = int(string[1:-2])
+    return number
+

@@ -3,11 +3,13 @@ from tkinter import font
 from tkinter import messagebox
 
 from qr_reader import get_data_from_qr
+from string_validator import extract_number
 import colors as color
 import db_driver as db
+import gui_register as reg
 
 
-class GUI_UDI:
+class GUI_UDI():
 
     def __init__(self):
         self.root = tk.Tk()
@@ -35,16 +37,12 @@ class GUI_UDI:
 
         self.form_frame.pack(padx=10, pady=10, fill='x')
 
-        self.continue_btn = tk.Button(
-            self.root, 
-            text="Siguiente", 
-            font=self.gothic_ui_light_14_font,
-            bg=color.aqua,
-            fg=color.white, 
-            borderwidth=0,
-            command=self.on_continue
-        )
-        self.continue_btn.pack(side="right", padx=20, pady=20)
+        self.btns_frame = tk.Frame(self.root)
+        self.config_btns_frame()
+
+        self.init_buttons()
+
+        self.btns_frame.pack(padx=20, pady=20, fill='y')
 
         self.root.mainloop()
 
@@ -62,10 +60,59 @@ class GUI_UDI:
         self.form_frame.columnconfigure(2, weight=1)
 
 
+    def config_btns_frame(self):
+        self.btns_frame.config(bg=color.dark_grey)
+        self.btns_frame.columnconfigure(0, weight=1)
+        self.btns_frame.columnconfigure(1, weight=1)
+        self.btns_frame.columnconfigure(2, weight=1)
+
+
+    def init_buttons(self):
+        self.continue_btn = tk.Button(
+            self.btns_frame, 
+            text="Siguiente", 
+            font=self.gothic_ui_light_14_font,
+            bg=color.blue,
+            fg=color.white, 
+            borderwidth=0,
+            command=self.on_continue,
+            padx=5,
+            pady=5
+        )
+        self.continue_btn.grid(row=0, column=2, sticky=tk.W+tk.E, padx=20, pady=20)
+
+        self.close_btn = tk.Button(
+            self.btns_frame, 
+            text="Terminar préstamo", 
+            font=self.gothic_ui_light_14_font,
+            bg=color.aqua,
+            fg=color.white, 
+            borderwidth=0,
+            command=self.on_close,
+            padx=5,
+            pady=5
+        )
+        self.close_btn.grid(row=0, column=1, sticky=tk.W+tk.E, padx=20, pady=20)
+
+        self.register_btn = tk.Button(
+            self.btns_frame, 
+            text="Registrar nuevo usuari@", 
+            font=self.gothic_ui_light_14_font,
+            bg=color.aqua,
+            fg=color.white, 
+            borderwidth=0,
+            command=self.on_register,
+            padx=5,
+            pady=5
+        )
+        self.register_btn.grid(row=0, column=0, sticky=tk.W+tk.E, padx=20, pady=20)
+
+
     def init_string_vars(self):
         self.service_var = tk.StringVar()
         self.service_var.set("Escoja una opción")
         self.service_var.trace("w", self.on_dropdown_changed)
+        self.srv_var_flag = True
 
         self.classroom_control_var = tk.StringVar()
         self.classroom_control_var.set("Escoja una opción")
@@ -124,17 +171,75 @@ class GUI_UDI:
 
 
     def on_continue(self):
-        qr_data = "Datos del QR: " + get_data_from_qr()
-        service = "Servicio solicitado: \t" + self.service_var.get() 
-        if self.service_var.get() == "Préstamo de control remoto":
-            messagebox.showinfo(title="Datos recopilados",message=qr_data + "\n" + service + "\nSalón del control prestado:\t" + self.classroom_control_var.get())
-        elif self.service_var.get() == "Préstamo de proyector":
-            messagebox.showinfo(title="Datos recopilados",message=qr_data + "\n" + service + "\nNúmero del cañón prestado:\t" + self.projector_number_var.get())
-        else:
-            messagebox.showinfo(title="Datos recopilados",message=qr_data + "\n" + service)
+        if self.validate_entries() == False:
+            messagebox.showerror(title="Datos incompletos", message="Complete los datos del formulario.")
+            return
+        
+        _usr_id = get_data_from_qr()
 
+        if _usr_id == "Nothing to show":
+            messagebox.showerror(title="Error al leer QR", message="No se proporcionó un código QR.")
+            return
+            
+        _srv_id = self.services_dict[self.service_var.get()]
+        _obj_id = "-1"
+        if self.service_var.get() != "Préstamo de computadora":
+            _obj_id = self.rmt_ctrls_dict[self.classroom_control_var.get()] if self.service_var.get() == "Préstamo de control remoto" else extract_number(self.projector_number_var.get())
+        
+        _res = self.driver.start_loan(_usr_id, _srv_id, _obj_id)
+
+        if _res != "OK":
+            messagebox.showerror(title="Error al insertar préstamo", message=_res)
+            return
+        
+        messagebox.showinfo(title="Préstamo exitoso.", message="¡Listo! ;)")
+        self.destroy_frame_grid()
+        self.init_dropdowns()
+            
+
+
+    def validate_entries(self):
+        serv = self.service_var.get()
+
+        if serv == "Escoja una opción":
+            return False
+        elif serv == "Préstamo de proyector":
+            if self.projector_number_var.get() == "Escoja una opción":
+                return False
+        elif serv == "Préstamo de control remoto":
+            if self.classroom_control_var.get() == "Escoja una opción":
+                return False
+            
+        return True
+
+
+    def on_register(self):
+        reg.register_GUI()
+
+
+    def on_close(self):
+        _usr_id = get_data_from_qr()
+
+        if _usr_id == "Nothing to show":
+            messagebox.showerror(title="Error al leer QR", message="No se proporcionó un código QR.")
+            return
+        
+        _res = self.driver.close_loan(_usr_id)
+
+        if _res != "OK":
+            messagebox.showerror(title="Error al cerrar préstamo", message=_res)
+            return
+        
+        messagebox.showinfo(title="Préstamo concluido.", message="¡Listo! ;)")
+        self.destroy_frame_grid()
+        self.init_dropdowns()
+        
 
     def on_dropdown_changed(self, *args):
+        if self.srv_var_flag == False:
+            self.srv_var_flag = True
+            return
+        
         option = self.service_var.get()
 
         if option == "Préstamo de proyector":
@@ -154,6 +259,20 @@ class GUI_UDI:
             self.classroom_control_dropdown.grid_forget()
             self.projector_label.grid_forget()
             self.projector_number_dropdown.grid_forget()
+
+
+    def destroy_frame_grid(self):
+        self.service_label.destroy()
+        self.service_dropdown.destroy()
+        self.control_label.destroy()
+        self.classroom_control_dropdown.destroy()
+        self.projector_label.destroy()
+        self.projector_number_dropdown.destroy()
+
+        self.srv_var_flag = False
+        self.service_var.set("Escoja una opción")
+        self.classroom_control_var.set("Escoja una opción")
+        self.projector_number_var.set("Escoja una opción")
 
 
 GUI_UDI()
