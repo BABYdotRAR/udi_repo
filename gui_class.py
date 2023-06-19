@@ -18,14 +18,14 @@ class GUI_UDI():
         self.driver = db.DB_Driver()
 
         self.gothic_ui_light_14_font = font.Font(family='Yu Gothic UI Light', size=14)
-        self.gothic_ui_16_font = font.Font(family='Yu Gothic UI', size=16)
+        self.gothic_ui_16_font = font.Font(family='Yu Gothic UI bold', size=16)
 
         self.welcome_label = tk.Label(
             self.root,
             text="Bienvenido de nuevo, por favor selecciona una opción",
             font=self.gothic_ui_16_font,
             fg=color.white,
-            bg=color.dark_grey
+            bg=color.dark_blue
         )
         self.welcome_label.pack(padx=10, pady=10)
 
@@ -42,26 +42,27 @@ class GUI_UDI():
 
         self.init_buttons()
 
-        self.btns_frame.pack(padx=20, pady=20, fill='y')
+        self.btns_frame.pack(padx=10, pady=10, fill='y')
 
+        self.root.state('zoomed')
         self.root.mainloop()
 
 
     def config_root(self):
         self.root.title("UDI ESIT")
         self.root.geometry("800x600")
-        self.root.config(bg=color.dark_grey)
+        self.root.config(bg=color.dark_blue)
 
 
     def config_form_frame(self):
-        self.form_frame.config(bg=color.dark_grey)
+        self.form_frame.config(bg=color.blue_ocean)
         self.form_frame.columnconfigure(0, weight=1)
         self.form_frame.columnconfigure(1, weight=1)
         self.form_frame.columnconfigure(2, weight=1)
 
 
     def config_btns_frame(self):
-        self.btns_frame.config(bg=color.dark_grey)
+        self.btns_frame.config(bg=color.blue_ocean)
         self.btns_frame.columnconfigure(0, weight=1)
         self.btns_frame.columnconfigure(1, weight=1)
         self.btns_frame.columnconfigure(2, weight=1)
@@ -72,8 +73,8 @@ class GUI_UDI():
             self.btns_frame, 
             text="Siguiente", 
             font=self.gothic_ui_light_14_font,
-            bg=color.blue,
-            fg=color.white, 
+            bg=color.light_purple,
+            fg=color.black, 
             borderwidth=0,
             command=self.on_continue,
             padx=5,
@@ -126,24 +127,24 @@ class GUI_UDI():
             text="Seleccione el servicio solicitado:",
             font=self.gothic_ui_light_14_font,
             fg=color.white,
-            bg=color.dark_grey
+            bg=color.blue_ocean
         )
-        self.service_label.grid(row=0, column=0, sticky=tk.W+tk.E)
+        self.service_label.grid(row=0, column=0, sticky=tk.W+tk.E, padx=10, pady=10)
         self.services_dict = {"Préstamo de computadora":1, "Préstamo de proyector":2, "Préstamo de control remoto":3}
         self.service_dropdown = tk.OptionMenu(
             self.form_frame, 
             self.service_var, 
             *self.services_dict.keys()
         )
-        self.service_dropdown.config(font=self.gothic_ui_light_14_font, bg=color.blue, fg=color.white, borderwidth=0)
-        self.service_dropdown.grid(row=1, column=0, sticky=tk.W+tk.E)
+        self.service_dropdown.config(font=self.gothic_ui_light_14_font, bg=color.light_purple, fg=color.black, borderwidth=0)
+        self.service_dropdown.grid(row=1, column=0, sticky=tk.W+tk.E, padx=10, pady=10)
 
         self.control_label = tk.Label(
             self.form_frame,
             text="Seleccione el control a prestar:",
             font=self.gothic_ui_light_14_font,
             fg=color.white,
-            bg=color.dark_grey
+            bg=color.blue_ocean
         )
         self.rmt_ctrls_list = self.driver.get_remote_controls()
         self.rmt_ctrls_dict = dict(self.rmt_ctrls_list)
@@ -152,14 +153,14 @@ class GUI_UDI():
             self.classroom_control_var, 
             *self.rmt_ctrls_dict.keys()
         )
-        self.classroom_control_dropdown.config(font=self.gothic_ui_light_14_font, bg=color.blue, fg=color.white, borderwidth=0)
+        self.classroom_control_dropdown.config(font=self.gothic_ui_light_14_font, bg=color.light_purple, fg=color.black, borderwidth=0)
 
         self.projector_label = tk.Label(
             self.form_frame,
             text="Seleccione el número de cañón a prestar:",
             font=self.gothic_ui_light_14_font,
             fg=color.white,
-            bg=color.dark_grey
+            bg=color.blue_ocean
         )
         self.projectors = self.driver.get_projectors()
         self.projector_number_dropdown = tk.OptionMenu(
@@ -167,7 +168,7 @@ class GUI_UDI():
             self.projector_number_var, 
             *self.projectors
         )
-        self.projector_number_dropdown.config(font=self.gothic_ui_light_14_font, bg=color.blue, fg=color.white, borderwidth=0)
+        self.projector_number_dropdown.config(font=self.gothic_ui_light_14_font, bg=color.light_purple, fg=color.black, borderwidth=0)
 
 
     def on_continue(self):
@@ -243,14 +244,14 @@ class GUI_UDI():
         option = self.service_var.get()
 
         if option == "Préstamo de proyector":
-            self.projector_label.grid(row=2, column=1, sticky=tk.W+tk.E)
-            self.projector_number_dropdown.grid(row=2, column=2, sticky=tk.W+tk.E)
+            self.projector_label.grid(row=2, column=1, sticky=tk.W+tk.E, padx=10, pady=10)
+            self.projector_number_dropdown.grid(row=2, column=2, sticky=tk.W+tk.E, padx=10, pady=10)
 
             self.control_label.grid_forget()
             self.classroom_control_dropdown.grid_forget()
         elif option == "Préstamo de control remoto":
-            self.control_label.grid(row=2, column=1, sticky=tk.W+tk.E)
-            self.classroom_control_dropdown.grid(row=2, column=2, sticky=tk.W+tk.E)
+            self.control_label.grid(row=2, column=1, sticky=tk.W+tk.E, padx=10, pady=10)
+            self.classroom_control_dropdown.grid(row=2, column=2, sticky=tk.W+tk.E, padx=10, pady=10)
 
             self.projector_label.grid_forget()
             self.projector_number_dropdown.grid_forget()

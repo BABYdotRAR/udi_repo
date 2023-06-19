@@ -17,7 +17,7 @@ class register_GUI():
         self.config_root()
 
         self.gothic_ui_light_14_font = font.Font(family='Yu Gothic UI Light', size=14)
-        self.gothic_ui_16_font = font.Font(family='Yu Gothic UI', size=16)
+        self.gothic_ui_16_font = font.Font(family='Yu Gothic UI bold', size=16)
 
         self.s = ttk.Style()
         self.s.configure('.', font=self.gothic_ui_light_14_font)
