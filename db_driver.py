@@ -26,12 +26,14 @@ class DB_Driver:
 
     
     def get_remote_controls(self):
+        self.conn.commit()
         self.cursor.execute("SELECT rmtctrl_id, rmtctrl_classroom FROM tc_remote_controls WHERE is_Available = TRUE")
         rmt_ctrls = [(rmtctrl_classroom, rmtctrl_id) for rmtctrl_id, rmtctrl_classroom in self.cursor]
         return rmt_ctrls
     
 
     def get_projectors(self):
+        self.conn.commit()
         self.cursor.execute("SELECT prjtr_id FROM tc_projectors WHERE is_Available = TRUE")
         projectors = [prjtr_id for prjtr_id in self.cursor]
         return projectors

@@ -146,6 +146,19 @@ class GUI_UDI():
         )
         self.current_loans_btn.grid(row=1, column=1, sticky=tk.W+tk.E, padx=20, pady=20)
 
+        self.refresh_btn = tk.Button(
+            self.btns_frame, 
+            text="Refrescar", 
+            font=self.gothic_ui_light_14_font,
+            bg=color.blue,
+            fg=color.white, 
+            borderwidth=0,
+            command=self.on_refresh,
+            padx=5,
+            pady=5
+        )
+        self.refresh_btn.grid(row=1, column=2, sticky=tk.W+tk.E, padx=20, pady=20)
+
 
     def init_string_vars(self):
         self.service_var = tk.StringVar()
@@ -299,6 +312,10 @@ class GUI_UDI():
         loans.GUI_list()
 
 
+    def on_refresh(self):
+        self.destroy_frame_grid()
+        self.init_dropdowns()
+        
     def on_manual_continue(self):
         if self.validate_entries() == False:
             messagebox.showerror(title="Datos incompletos", message="Complete los datos del formulario.")
