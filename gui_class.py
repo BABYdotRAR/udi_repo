@@ -7,6 +7,7 @@ from string_validator import extract_number
 import colors as color
 import db_driver as db
 import gui_register as reg
+import gui_loans_list as loans
 
 
 class GUI_UDI():
@@ -131,6 +132,19 @@ class GUI_UDI():
             pady=5
         )
         self.register_btn.grid(row=0, column=0, sticky=tk.W+tk.E, padx=20, pady=20)
+
+        self.current_loans_btn = tk.Button(
+            self.btns_frame, 
+            text="Ver préstamos activos", 
+            font=self.gothic_ui_light_14_font,
+            bg=color.blue,
+            fg=color.white, 
+            borderwidth=0,
+            command=self.on_current_loans,
+            padx=5,
+            pady=5
+        )
+        self.current_loans_btn.grid(row=1, column=1, sticky=tk.W+tk.E, padx=20, pady=20)
 
 
     def init_string_vars(self):
@@ -279,7 +293,11 @@ class GUI_UDI():
         self.destroy_frame_grid()
         self.init_dropdowns()
         messagebox.showinfo(title="Préstamo concluido.", message="¡Listo! ;)\nTermina préstamo para: "+_usr_id)  
-        
+      
+
+    def on_current_loans(self):
+        loans.GUI_list()
+
 
     def on_manual_continue(self):
         if self.validate_entries() == False:

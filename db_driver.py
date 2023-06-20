@@ -84,5 +84,18 @@ class DB_Driver:
         return rmt_ctrls_loaned
 
 
+    def get_current_loaned_projectors(self):
+        query = "select a.usr_id, c.prjtr_id from te_loans a inner join te_loan_complement b on a.cmplmt_id = b. cmplmt_id inner join tc_projectors c on b.prjtr_id = c.prjtr_id WHERE a.is_active = TRUE"
+        self.cursor.execute(query)
+        projectors_loaned = [(usr_id, prjtr_id) for usr_id, prjtr_id in self.cursor]
+        return projectors_loaned
+
+    def get_current_loaned_computers(self):
+        query = "select usr_id from te_loans WHERE cmplmt_id IS NULL AND is_active = TRUE"
+        self.cursor.execute(query)
+        projectors_loaned = [usr_id for usr_id in self.cursor]
+        return projectors_loaned
+    
+
     def close_connection(self):
         self.conn.close()
