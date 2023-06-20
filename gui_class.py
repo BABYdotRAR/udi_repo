@@ -18,6 +18,7 @@ class GUI_UDI():
         self.driver = db.DB_Driver()
 
         self.gothic_ui_light_14_font = font.Font(family='Yu Gothic UI Light', size=14)
+        self.gothic_ui_light_10_font = font.Font(family='Yu Gothic UI Light', size=10)
         self.gothic_ui_16_font = font.Font(family='Yu Gothic UI bold', size=16)
 
         self.welcome_label = tk.Label(
@@ -44,6 +45,22 @@ class GUI_UDI():
 
         self.btns_frame.pack(padx=10, pady=10, fill='y')
 
+        self.manual_reg_frame = tk.Frame(self.root)
+        self.config_manual_reg_frame()
+
+        self.init_manual_reg_widgets()
+
+        self.manual_reg_frame.pack(padx=10, pady=10, fill='x')
+
+        self.credits_label = tk.Label(
+            self.root,
+            text="© 2023 Oscar López All rights Reserved",
+            font=self.gothic_ui_light_10_font,
+            fg=color.white,
+            bg=color.dark_blue
+        )
+        self.credits_label.pack(padx=10, pady=10, side="bottom")
+
         self.root.state('zoomed')
         self.root.mainloop()
 
@@ -66,6 +83,13 @@ class GUI_UDI():
         self.btns_frame.columnconfigure(0, weight=1)
         self.btns_frame.columnconfigure(1, weight=1)
         self.btns_frame.columnconfigure(2, weight=1)
+
+
+    def config_manual_reg_frame(self):
+        self.manual_reg_frame.config(bg=color.blue_ocean)
+        self.manual_reg_frame.columnconfigure(0, weight=1)
+        self.manual_reg_frame.columnconfigure(1, weight=1)
+        self.manual_reg_frame.columnconfigure(2, weight=1)
 
 
     def init_buttons(self):
@@ -119,6 +143,7 @@ class GUI_UDI():
         self.classroom_control_var.set("Escoja una opción")
         self.projector_number_var = tk.StringVar()
         self.projector_number_var.set("Escoja una opción")
+        self.user_id_var = tk.StringVar()
 
 
     def init_dropdowns(self):
@@ -171,7 +196,40 @@ class GUI_UDI():
         self.projector_number_dropdown.config(font=self.gothic_ui_light_14_font, bg=color.light_purple, fg=color.black, borderwidth=0)
 
 
+    def init_manual_reg_widgets(self):
+        self.manual_reg_flag = False
+
+        self.user_id_label = tk.Label(
+            self.manual_reg_frame,
+            text="Ingrese la boleta:",
+            font=self.gothic_ui_light_14_font,
+            fg=color.white,
+            bg=color.blue_ocean
+        )
+        
+        self.user_id_entry = tk.Entry(
+            self.manual_reg_frame,
+            textvariable=self.user_id_var,
+            font=self.gothic_ui_light_14_font
+        )
+        
+        self.manual_register_btn = tk.Button(
+            self.manual_reg_frame, 
+            text="Siguiente", 
+            font=self.gothic_ui_light_14_font,
+            bg=color.light_purple,
+            fg=color.black, 
+            borderwidth=0,
+            command=self.on_manual_continue,
+            padx=5,
+            pady=5
+        )
+
+
     def on_continue(self):
+        if self.manual_reg_flag:
+            self.grid_forget_manual_reg_widgets()
+        
         if self.validate_entries() == False:
             messagebox.showerror(title="Datos incompletos", message="Complete los datos del formulario.")
             return
@@ -179,6 +237,9 @@ class GUI_UDI():
         _usr_id = get_data_from_qr()
 
         if _usr_id == "Nothing to show":
+            if self.manual_reg_flag == False:
+                self.grid_manual_reg_widgets()
+
             messagebox.showerror(title="Error al leer QR", message="No se proporcionó un código QR.")
             return
             
@@ -193,25 +254,9 @@ class GUI_UDI():
             messagebox.showerror(title="Error al insertar préstamo", message=_res)
             return
         
-        messagebox.showinfo(title="Préstamo exitoso.", message="¡Listo! ;)")
         self.destroy_frame_grid()
         self.init_dropdowns()
-            
-
-
-    def validate_entries(self):
-        serv = self.service_var.get()
-
-        if serv == "Escoja una opción":
-            return False
-        elif serv == "Préstamo de proyector":
-            if self.projector_number_var.get() == "Escoja una opción":
-                return False
-        elif serv == "Préstamo de control remoto":
-            if self.classroom_control_var.get() == "Escoja una opción":
-                return False
-            
-        return True
+        messagebox.showinfo(title="Préstamo exitoso.", message="¡Listo! ;)\nInicia préstamo para: "+_usr_id)           
 
 
     def on_register(self):
@@ -231,10 +276,33 @@ class GUI_UDI():
             messagebox.showerror(title="Error al cerrar préstamo", message=_res)
             return
         
-        messagebox.showinfo(title="Préstamo concluido.", message="¡Listo! ;)")
         self.destroy_frame_grid()
         self.init_dropdowns()
+        messagebox.showinfo(title="Préstamo concluido.", message="¡Listo! ;)\nTermina préstamo para: "+_usr_id)  
         
+
+    def on_manual_continue(self):
+        if self.validate_entries() == False:
+            messagebox.showerror(title="Datos incompletos", message="Complete los datos del formulario.")
+            return
+        
+        _usr_id = self.user_id_var.get()
+        _srv_id = self.services_dict[self.service_var.get()]
+        _obj_id = "-1"
+        if self.service_var.get() != "Préstamo de computadora":
+            _obj_id = self.rmt_ctrls_dict[self.classroom_control_var.get()] if self.service_var.get() == "Préstamo de control remoto" else extract_number(self.projector_number_var.get())
+        
+        _res = self.driver.start_loan(_usr_id, _srv_id, _obj_id)
+
+        if _res != "OK":
+            messagebox.showerror(title="Error al insertar préstamo", message=_res)
+            return
+        
+        self.grid_forget_manual_reg_widgets()
+        self.destroy_frame_grid()
+        self.init_dropdowns()
+        messagebox.showinfo(title="Préstamo exitoso.", message="¡Listo! ;)\nInicia préstamo para: "+_usr_id)
+
 
     def on_dropdown_changed(self, *args):
         if self.srv_var_flag == False:
@@ -260,6 +328,37 @@ class GUI_UDI():
             self.classroom_control_dropdown.grid_forget()
             self.projector_label.grid_forget()
             self.projector_number_dropdown.grid_forget()
+
+
+    def validate_entries(self):
+        serv = self.service_var.get()
+
+        if serv == "Escoja una opción":
+            return False
+        elif serv == "Préstamo de proyector":
+            if self.projector_number_var.get() == "Escoja una opción":
+                return False
+        elif serv == "Préstamo de control remoto":
+            if self.classroom_control_var.get() == "Escoja una opción":
+                return False
+            
+        return True
+        
+
+    def grid_manual_reg_widgets(self):
+        self.manual_reg_flag = True
+
+        self.user_id_label.grid(row=0, column=0, sticky=tk.W+tk.E, padx=10, pady=10)
+        self.user_id_entry.grid(row=0, column=1, sticky=tk.W+tk.E, padx=10, pady=10)
+        self.manual_register_btn.grid(row=0, column=2, sticky=tk.W+tk.E, padx=10, pady=10)
+
+    
+    def grid_forget_manual_reg_widgets(self):
+        self.manual_reg_flag = False
+        
+        self.user_id_label.grid_forget()
+        self.user_id_entry.grid_forget()
+        self.manual_register_btn.grid_forget()
 
 
     def destroy_frame_grid(self):

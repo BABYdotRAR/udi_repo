@@ -77,5 +77,12 @@ class DB_Driver:
         return "OK"
 
 
+    def get_current_loaned_controls(self):
+        query = "select a.usr_id, c.rmtctrl_classroom from te_loans a inner join te_loan_complement b on a.cmplmt_id = b. cmplmt_id inner join tc_remote_controls c on b.rmtctrl_id = c.rmtctrl_id WHERE a.is_active = TRUE"
+        self.cursor.execute(query)
+        rmt_ctrls_loaned = [(usr_id, rmtctrl_classroom) for usr_id, rmtctrl_classroom in self.cursor]
+        return rmt_ctrls_loaned
+
+
     def close_connection(self):
         self.conn.close()
