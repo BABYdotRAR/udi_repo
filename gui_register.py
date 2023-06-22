@@ -195,6 +195,7 @@ class register_GUI():
                     messagebox.showerror(title="Error al enviar el correo", message=res)
 
             self.insert_user()
+            self.root.destroy()
     
 
     def validate_entries(self):

@@ -11,55 +11,30 @@ import gui_loans_list as loans
 
 
 class GUI_UDI():
-
     def __init__(self):
         self.root = tk.Tk()
 
         self.config_root()
         self.driver = db.DB_Driver()
+        self.init_fonts()
+        self.init_string_vars()
 
-        self.gothic_ui_light_14_font = font.Font(family='Yu Gothic UI Light', size=14)
-        self.gothic_ui_light_10_font = font.Font(family='Yu Gothic UI Light', size=10)
-        self.gothic_ui_16_font = font.Font(family='Yu Gothic UI bold', size=16)
-
-        self.welcome_label = tk.Label(
-            self.root,
-            text="Bienvenido de nuevo, por favor selecciona una opción",
-            font=self.gothic_ui_16_font,
-            fg=color.white,
-            bg=color.dark_blue
-        )
+        self.welcome_label = self.create_label(self.root, "Bienvenido de nuevo, por favor selecciona una opción", self.gothic_ui_bold_16_font)
         self.welcome_label.pack(padx=10, pady=10)
 
-        self.form_frame = tk.Frame(self.root)
-        self.config_form_frame()
-
-        self.init_string_vars()
+        self.form_frame = self.create_frame(self.root, background_color=color.blue_ocean)
         self.init_dropdowns()
-
         self.form_frame.pack(padx=10, pady=10, fill='x')
 
-        self.btns_frame = tk.Frame(self.root)
-        self.config_btns_frame()
-
+        self.btns_frame = self.create_frame(self.root, background_color=color.blue_ocean)
         self.init_buttons()
-
         self.btns_frame.pack(padx=10, pady=10, fill='y')
 
-        self.manual_reg_frame = tk.Frame(self.root)
-        self.config_manual_reg_frame()
-
+        self.manual_reg_frame = self.create_frame(self.root, background_color=color.blue_ocean)
         self.init_manual_reg_widgets()
-
         self.manual_reg_frame.pack(padx=10, pady=10, fill='x')
 
-        self.credits_label = tk.Label(
-            self.root,
-            text="© 2023 Oscar López All rights Reserved",
-            font=self.gothic_ui_light_10_font,
-            fg=color.white,
-            bg=color.dark_blue
-        )
+        self.credits_label = self.create_label(self.root, "© 2023 Oscar López All rights Reserved",self.gothic_ui_light_10_font)
         self.credits_label.pack(padx=10, pady=10, side="bottom")
 
         self.root.state('zoomed')
@@ -72,91 +47,63 @@ class GUI_UDI():
         self.root.config(bg=color.dark_blue)
 
 
-    def config_form_frame(self):
-        self.form_frame.config(bg=color.blue_ocean)
-        self.form_frame.columnconfigure(0, weight=1)
-        self.form_frame.columnconfigure(1, weight=1)
-        self.form_frame.columnconfigure(2, weight=1)
+    def create_frame(self, parent:tk.Frame, total_cols=3, background_color=color.dark_blue):
+        frame = tk.Frame(parent)
+        frame.config(bg=background_color)
+        for i in range(total_cols):
+            frame.columnconfigure(i, weight=1)
+        return frame
 
 
-    def config_btns_frame(self):
-        self.btns_frame.config(bg=color.blue_ocean)
-        self.btns_frame.columnconfigure(0, weight=1)
-        self.btns_frame.columnconfigure(1, weight=1)
-        self.btns_frame.columnconfigure(2, weight=1)
+    def create_label(self, parent:tk.Frame, label_text:str, label_font:font, 
+                    text_color=color.white, background_color=color.dark_blue):
+        lbl = tk.Label(
+            parent,
+            text=label_text,
+            font=label_font,
+            fg=text_color,
+            bg=background_color
+        )
+        return lbl
+    
 
+    def create_button(self, parent:tk.Frame, btn_action, btn_text:str, btn_font:font, 
+                      text_color=color.black, background_color=color.light_purple):
+        btn = tk.Button(
+            parent,
+            text=btn_text,
+            font=btn_font,
+            command=btn_action,
+            fg=text_color,
+            bg=background_color,
+            borderwidth=0,
+            padx=5, pady=5
+        )
+        return btn
+    
 
-    def config_manual_reg_frame(self):
-        self.manual_reg_frame.config(bg=color.blue_ocean)
-        self.manual_reg_frame.columnconfigure(0, weight=1)
-        self.manual_reg_frame.columnconfigure(1, weight=1)
-        self.manual_reg_frame.columnconfigure(2, weight=1)
+    def init_fonts(self):
+        self.gothic_ui_light_10_font = font.Font(family='Yu Gothic UI Light', size=10)
+        self.gothic_ui_light_12_font = font.Font(family='Yu Gothic UI Light', size=12)
+        self.gothic_ui_light_14_font = font.Font(family='Yu Gothic UI Light', size=14)
+        self.gothic_ui_bold_14_font = font.Font(family='Yu Gothic UI bold', size=14)
+        self.gothic_ui_bold_16_font = font.Font(family='Yu Gothic UI bold', size=16)
 
 
     def init_buttons(self):
-        self.continue_btn = tk.Button(
-            self.btns_frame, 
-            text="Siguiente", 
-            font=self.gothic_ui_light_14_font,
-            bg=color.light_purple,
-            fg=color.black, 
-            borderwidth=0,
-            command=self.on_continue,
-            padx=5,
-            pady=5
-        )
+        self.continue_btn = self.create_button(self.btns_frame, self.on_continue, "Siguiente", self.gothic_ui_light_14_font)
         self.continue_btn.grid(row=0, column=2, sticky=tk.W+tk.E, padx=20, pady=20)
 
-        self.close_btn = tk.Button(
-            self.btns_frame, 
-            text="Terminar préstamo", 
-            font=self.gothic_ui_light_14_font,
-            bg=color.aqua,
-            fg=color.white, 
-            borderwidth=0,
-            command=self.on_close,
-            padx=5,
-            pady=5
-        )
+        self.close_btn = self.create_button(self.btns_frame, self.on_close, "Terminar préstamo", self.gothic_ui_light_14_font, text_color=color.white, background_color=color.aqua)
         self.close_btn.grid(row=0, column=1, sticky=tk.W+tk.E, padx=20, pady=20)
 
-        self.register_btn = tk.Button(
-            self.btns_frame, 
-            text="Registrar nuevo usuari@", 
-            font=self.gothic_ui_light_14_font,
-            bg=color.aqua,
-            fg=color.white, 
-            borderwidth=0,
-            command=self.on_register,
-            padx=5,
-            pady=5
-        )
+        self.register_btn = self.create_button(self.btns_frame, self.on_register, "Registrar nuevo usuari@", self.gothic_ui_light_14_font, text_color=color.white, background_color=color.aqua)
         self.register_btn.grid(row=0, column=0, sticky=tk.W+tk.E, padx=20, pady=20)
 
-        self.current_loans_btn = tk.Button(
-            self.btns_frame, 
-            text="Ver préstamos activos", 
-            font=self.gothic_ui_light_14_font,
-            bg=color.blue,
-            fg=color.white, 
-            borderwidth=0,
-            command=self.on_current_loans,
-            padx=5,
-            pady=5
-        )
+        self.current_loans_btn = self.create_button(self.btns_frame, self.on_current_loans, "Ver préstamos activos", self.gothic_ui_light_14_font, text_color=color.white, background_color=color.blue)
         self.current_loans_btn.grid(row=1, column=1, sticky=tk.W+tk.E, padx=20, pady=20)
 
-        self.refresh_btn = tk.Button(
-            self.btns_frame, 
-            text="Refrescar", 
-            font=self.gothic_ui_light_14_font,
-            bg=color.blue,
-            fg=color.white, 
-            borderwidth=0,
-            command=self.on_refresh,
-            padx=5,
-            pady=5
-        )
+        self.refresh_btn = self.create_button(self.btns_frame, self.on_refresh, "Refrescar", self.gothic_ui_light_14_font, text_color=color.white, background_color=color.blue)
         self.refresh_btn.grid(row=1, column=2, sticky=tk.W+tk.E, padx=20, pady=20)
 
 
@@ -174,15 +121,13 @@ class GUI_UDI():
 
 
     def init_dropdowns(self):
-        self.service_label = tk.Label(
-            self.form_frame,
-            text="Seleccione el servicio solicitado:",
-            font=self.gothic_ui_light_14_font,
-            fg=color.white,
-            bg=color.blue_ocean
-        )
-        self.service_label.grid(row=0, column=0, sticky=tk.W+tk.E, padx=10, pady=10)
         self.services_dict = {"Préstamo de computadora":1, "Préstamo de proyector":2, "Préstamo de control remoto":3}
+        self.rmt_ctrls_list = self.driver.get_available_remote_controls()
+        self.rmt_ctrls_dict = dict(self.rmt_ctrls_list)
+        self.projectors = self.driver.get_available_projectors()
+
+        self.service_label = self.create_label(self.form_frame, "Seleccione el servicio solicitado:",self.gothic_ui_light_14_font,background_color=color.blue_ocean)
+        self.service_label.grid(row=0, column=0, sticky=tk.W+tk.E, padx=10, pady=10)
         self.service_dropdown = tk.OptionMenu(
             self.form_frame, 
             self.service_var, 
@@ -191,15 +136,7 @@ class GUI_UDI():
         self.service_dropdown.config(font=self.gothic_ui_light_14_font, bg=color.light_purple, fg=color.black, borderwidth=0)
         self.service_dropdown.grid(row=1, column=0, sticky=tk.W+tk.E, padx=10, pady=10)
 
-        self.control_label = tk.Label(
-            self.form_frame,
-            text="Seleccione el control a prestar:",
-            font=self.gothic_ui_light_14_font,
-            fg=color.white,
-            bg=color.blue_ocean
-        )
-        self.rmt_ctrls_list = self.driver.get_remote_controls()
-        self.rmt_ctrls_dict = dict(self.rmt_ctrls_list)
+        self.control_label = self.create_label(self.form_frame, "Seleccione el control a prestar:",self.gothic_ui_light_14_font,background_color=color.blue_ocean)
         self.classroom_control_dropdown = tk.OptionMenu(
             self.form_frame, 
             self.classroom_control_var, 
@@ -207,14 +144,7 @@ class GUI_UDI():
         )
         self.classroom_control_dropdown.config(font=self.gothic_ui_light_14_font, bg=color.light_purple, fg=color.black, borderwidth=0)
 
-        self.projector_label = tk.Label(
-            self.form_frame,
-            text="Seleccione el número de cañón a prestar:",
-            font=self.gothic_ui_light_14_font,
-            fg=color.white,
-            bg=color.blue_ocean
-        )
-        self.projectors = self.driver.get_projectors()
+        self.projector_label = self.create_label(self.form_frame, "Seleccione el número de cañón a prestar:",self.gothic_ui_light_14_font,background_color=color.blue_ocean)
         self.projector_number_dropdown = tk.OptionMenu(
             self.form_frame, 
             self.projector_number_var, 
@@ -226,31 +156,15 @@ class GUI_UDI():
     def init_manual_reg_widgets(self):
         self.manual_reg_flag = False
 
-        self.user_id_label = tk.Label(
-            self.manual_reg_frame,
-            text="Ingrese la boleta:",
-            font=self.gothic_ui_light_14_font,
-            fg=color.white,
-            bg=color.blue_ocean
-        )
-        
+        self.user_id_label = self.create_label(self.manual_reg_frame, "Ingrese la boleta:", self.gothic_ui_light_14_font, background_color=color.blue_ocean)
+
         self.user_id_entry = tk.Entry(
             self.manual_reg_frame,
             textvariable=self.user_id_var,
             font=self.gothic_ui_light_14_font
         )
         
-        self.manual_register_btn = tk.Button(
-            self.manual_reg_frame, 
-            text="Siguiente", 
-            font=self.gothic_ui_light_14_font,
-            bg=color.light_purple,
-            fg=color.black, 
-            borderwidth=0,
-            command=self.on_manual_continue,
-            padx=5,
-            pady=5
-        )
+        self.manual_register_btn = self.create_button(self.manual_reg_frame, self.on_manual_continue, "Siguiente", self.gothic_ui_light_14_font)
 
 
     def on_continue(self):
@@ -309,13 +223,14 @@ class GUI_UDI():
       
 
     def on_current_loans(self):
-        loans.GUI_list()
+        loans.GUI_Current_Loans()
 
 
     def on_refresh(self):
         self.destroy_frame_grid()
         self.init_dropdowns()
         
+
     def on_manual_continue(self):
         if self.validate_entries() == False:
             messagebox.showerror(title="Datos incompletos", message="Complete los datos del formulario.")
