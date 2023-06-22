@@ -247,11 +247,8 @@ class register_GUI():
 
         if query_result == "OK":
             messagebox.showinfo(title="Usuario registrado", 
-                                message="Usuario registrado correctamente, su código QR ha sido enviado al teléfono proporcionado.")
+                                message="Usuario registrado correctamente, su código QR ha sido enviado al teléfono o correo proporcionado.")
         else:
             messagebox.showerror(title="Error en el registro", message=query_result)
 
         driver.close_connection()
-
-
-#register_GUI()

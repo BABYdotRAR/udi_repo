@@ -2,6 +2,8 @@ import mariadb
 import sys
 import env_variables as env
 
+from string_validator import extract_number
+
 
 class DB_Driver:
     def __init__(self):
@@ -62,22 +64,38 @@ class DB_Driver:
 
     def start_loan(self, id_usr, id_srv, id_obj):
         try:
-            self.cursor.execute("CALL insert_loan(?,?,?)", (id_usr, id_srv, id_obj))
+            self.cursor.execute("CALL insert_loan(?,?,?,@v)", (id_usr, id_srv, id_obj))
         except mariadb.Error as e:
             return f"Error: {e}"
         
         self.conn.commit()
-        return "OK"
+        self.cursor.execute("SELECT @v")
+        _res = 1
+        for v in self.cursor:
+            _res = extract_number(str(v))
+
+        if _res == 0:
+            return "OK"
+        else:
+            return "Error: boleta inválida, por favor regístrese primero"
     
 
     def close_loan(self, id_usr):
         try:
-            self.cursor.execute("CALL close_loan(?)", (id_usr,))
+            self.cursor.execute("CALL close_loan(?, @v)", (id_usr,))
         except mariadb.Error as e:
             return f"Error: {e}"
         
         self.conn.commit()
-        return "OK"
+        self.cursor.execute("SELECT @v")
+        _res = 1
+        for v in self.cursor:
+            _res = extract_number(str(v))
+
+        if _res == 0:
+            return "OK"
+        else:
+            return "Error: boleta inválida, por favor regístrese primero"
 
 
     def get_current_loaned_controls(self):
