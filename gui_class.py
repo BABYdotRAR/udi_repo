@@ -4,6 +4,7 @@ from tkinter import messagebox
 
 from qr_reader import get_data_from_qr
 from string_validator import extract_number
+from network_validator import has_connection_to_internet
 import colors as color
 import db_driver as db
 import gui_register as reg
@@ -38,6 +39,9 @@ class GUI_UDI():
         self.manual_reg_frame = self.create_frame(self.root, background_color=color.blue_ocean)
         self.init_manual_reg_widgets()
         self.manual_reg_frame.pack(padx=10, pady=10, fill='x')
+
+        self.info_label = self.create_label(self.root, "", self.gothic_ui_light_12_font)
+        self.info_label.pack(padx=10, pady=10, side="left")
 
         self.credits_label = self.create_label(self.root, "© 2023 Oscar López All rights Reserved",self.gothic_ui_light_10_font)
         self.credits_label.pack(padx=10, pady=10, side="bottom")
@@ -94,7 +98,7 @@ class GUI_UDI():
     
 
     def create_button(self, parent:tk.Frame, btn_action, btn_text:str, btn_font:font, 
-                      text_color=color.black, background_color=color.light_purple):
+                      text_color=color.black, background_color=color.light_purple, lbl_hover_text=""):
         btn = tk.Button(
             parent,
             text=btn_text,
@@ -105,6 +109,8 @@ class GUI_UDI():
             borderwidth=0,
             padx=5, pady=5
         )
+        btn.bind("<Enter>", func=lambda e: self.on_button_hover(lbl_hover_text))
+        btn.bind("<Leave>", func=lambda e: self.info_label.config(text=""))
         return btn
     
 
@@ -117,19 +123,33 @@ class GUI_UDI():
 
 
     def init_buttons(self):
-        self.continue_btn = self.create_button(self.form_frame, self.on_continue, "Siguiente", self.gothic_ui_light_14_font)
+        _continue_info = """Info: Solicita el préstamo en selección (botones morados), se abrirá una ventana con la webcam donde se deberá presentar
+        el código QR que se le asignó al usuario al momento de registrarse; en caso de no contar con éste se deberá registrar primero o solicitar 
+        unn reenvío si es que ya está registrado, finalmente, si no dispone de un medio para mostrar el QR pero ya se ha registrado en el sistema, 
+        podrá registrar su préstamo ingresando su boleta, solo deberá presionar la letra Q cuando se muestre la webcam."""
+        self.continue_btn = self.create_button(self.form_frame, self.on_continue, "Siguiente", self.gothic_ui_light_14_font, lbl_hover_text=_continue_info)
         self.continue_btn.grid(row=3, column=2, sticky=tk.W+tk.E, padx=20, pady=20)
 
-        self.close_btn = self.create_button(self.btns_frame, self.on_close, "Terminar préstamo", self.gothic_ui_light_14_font, text_color=color.white, background_color=color.aqua)
+        _close_info = """Info: Finaliza el préstamo del solicitante, para ello nuevamente se abrirá la webcam y se deberá presentar
+        el código QR asignado, no hace falta especificar en el formulario el tipo de préstamo a cerrar; si el usuario no cuenta con
+        el código QR a la mano se podrá cerrar el préstamo manualmente desde la ventana de 'Prestamos activos'."""
+        self.close_btn = self.create_button(self.btns_frame, self.on_close, "Terminar préstamo", self.gothic_ui_light_14_font, text_color=color.white, background_color=color.aqua, lbl_hover_text=_close_info)
         self.close_btn.grid(row=1, column=1, sticky=tk.W+tk.E, padx=20, pady=20)
 
-        self.register_btn = self.create_button(self.btns_frame, self.on_register, "Registrar nuevo usuari@", self.gothic_ui_light_14_font, text_color=color.white, background_color=color.aqua)
+        _register_info = """Info: Registra un nuevo usuario en el sistema para que éste pueda solicitar préstamos, una vez culminado su registro
+        se le enviará un código QR al método seleccionado, con dicho código se podrá solicitar los préstamos. El registro se hace una sola vez, y
+        además el registro no inicia el préstamo solicitado, para eso es el formulario principal (botones morados)."""
+        self.register_btn = self.create_button(self.btns_frame, self.on_register, "Registrar nuevo usuari@", self.gothic_ui_light_14_font, text_color=color.white, background_color=color.aqua, lbl_hover_text=_register_info)
         self.register_btn.grid(row=1, column=0, sticky=tk.W+tk.E, padx=20, pady=20)
 
-        self.current_loans_btn = self.create_button(self.btns_frame, self.on_current_loans, "Ver préstamos activos", self.gothic_ui_light_14_font, text_color=color.white, background_color=color.blue)
+        _loans_info = """Abre la ventana de Prestamos activos, en ésta se podrá visualizar todos los préstamos (ordenados por tipo) que no han sido 
+        finalizados, además seleccionando dichos préstamos y haciendo clic en 'Terminar préstamo' se podrá finalizarlos manualmente."""
+        self.current_loans_btn = self.create_button(self.btns_frame, self.on_current_loans, "Ver préstamos activos", self.gothic_ui_light_14_font, text_color=color.white, background_color=color.blue, lbl_hover_text=_loans_info)
         self.current_loans_btn.grid(row=1, column=2, sticky=tk.W+tk.E, padx=20, pady=20)
 
-        self.refresh_btn = self.create_button(self.btns_frame, self.on_refresh, "Refrescar", self.gothic_ui_light_14_font, text_color=color.white, background_color=color.blue)
+        _refresh_info = """Actualiza los datos del formulario (botones morados) en caso de que algún préstamo de proyector/control haya finalizado pero
+        aún no sea visible el dispositivo en las opciones a la hora de solicitar el préstamo."""
+        self.refresh_btn = self.create_button(self.btns_frame, self.on_refresh, "Refrescar", self.gothic_ui_light_14_font, text_color=color.white, background_color=color.blue, lbl_hover_text=_register_info)
         self.refresh_btn.grid(row=1, column=3, sticky=tk.W+tk.E, padx=20, pady=20)
 
 
@@ -289,13 +309,19 @@ class GUI_UDI():
 
 
     def on_resend_qr(self):
-        resend.GUI_Resend_QR()
+        if has_connection_to_internet():
+            resend.GUI_Resend_QR()
+        else:
+            messagebox.showinfo(title="Sin conexión a internet", message="Por el momento no tienes conexión a internet, por favor inténtalo más tarde.")
 
 
     def on_report(self):
-        report.GUI_Issue()
+        if has_connection_to_internet():
+            report.GUI_Issue()
+        else:
+            messagebox.showinfo(title="Sin conexión a internet", message="Por el momento no tienes conexión a internet, por favor inténtalo más tarde.")
 
-        
+
     def on_dropdown_changed(self, *args):
         if self.srv_var_flag == False:
             self.srv_var_flag = True
@@ -320,6 +346,10 @@ class GUI_UDI():
             self.classroom_control_dropdown.grid_forget()
             self.projector_label.grid_forget()
             self.projector_number_dropdown.grid_forget()
+
+
+    def on_button_hover(self, lbl_text):
+        self.info_label.config(text=lbl_text)
 
 
     def validate_entries(self):

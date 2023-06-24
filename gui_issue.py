@@ -10,6 +10,8 @@ class GUI_Issue:
         self.root = tk.Toplevel()
         self.root.title("Reportar un problema con la aplicación")
         
+        self.label = tk.Label(self.root, text="Por favor redacta el problema encontrado:")
+        self.label.pack()
         self.textbox = tk.Text(self.root, height=7, width=70)
         self.textbox.pack(expand=1)
 
