@@ -177,7 +177,7 @@ class GUI_Current_Loans:
             self.init_treeviews()
             self.user_id_close_loan = []
         else:
-            showerror(title="Error al cerrar préstamo", message="Seleccione al menos un préstamo a cerrar.")
+            showerror(title="Error al cerrar préstamo", message="Seleccione al menos un préstamo a cerrar.", parent=self.root)
 
 
     def close_loan(self, _id):
@@ -185,10 +185,10 @@ class GUI_Current_Loans:
         _res = self.driver.close_loan(_usr_id)
 
         if _res != "OK":
-            showerror(title="Error al cerrar préstamo", message=_res)
+            showerror(title="Error al cerrar préstamo", message=_res, parent=self.root)
             return
         
-        showinfo(title="Préstamo concluido.", message="¡Listo! ;)\nTermina préstamo para: "+str(_usr_id))  
+        showinfo(title="Préstamo concluido.", message="¡Listo! ;)\nTermina préstamo para: "+str(_usr_id), parent=self.root)  
 
 
     def destroy_treeviews(self):

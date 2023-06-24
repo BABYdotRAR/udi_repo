@@ -37,3 +37,25 @@ def send_email_with_image(receiver_email, image_path):
     except Exception as e:
         return f'An error occurred while sending the email: {str(e)}'
     
+
+
+def send_email_with_body(receiver_email, body_text):
+    # Create a new email message
+    msg = EmailMessage()
+    msg['Subject'] = subject
+    msg['From'] = sender_email
+    msg['To'] = receiver_email
+    msg.set_content(body_text)
+
+    # Set up the SMTP server
+    smtp_server = 'smtp.gmail.com'
+    smtp_port = 465
+    context = ssl.create_default_context()
+    try:
+        with smtplib.SMTP_SSL(smtp_server, smtp_port, context=context) as server:
+            server.login(sender_email, sender_password)
+            server.send_message(msg)
+            return "OK"
+    except Exception as e:
+        return f'An error occurred while sending the email: {str(e)}'
+    

@@ -6,6 +6,7 @@ from tkinter import messagebox
 from qr_generator import create_img
 from whatsapp_handler import send_img
 from email_handler import send_email_with_image
+from network_validator import has_connection_to_internet
 import colors as color
 import string_validator as str_val
 import env_variables as env
@@ -181,22 +182,31 @@ class register_GUI():
         _email = self.email.get()
 
         if err_msg != "":
-            messagebox.showerror(title="Datos incompletos", message="Atienda lo que se solicita:\n"+err_msg)
+            messagebox.showerror(title="Datos incompletos", message="Atienda lo que se solicita:\n"+err_msg, parent=self.root)
         else:
             create_img(qr_data, qr_data)
             path = env.PROJECT_PATH + "\\img\\" + qr_data + ".jpg"
             number = "+52" + _phone_number
+            conn_msg = ""
             
-            if self.qr_option.get() == "Mensaje por Whatsapp":
-                send_img(path, number)
+            if has_connection_to_internet():
+                self.send_qr(self.qr_option.get(), number, _email, path)
             else:
-                res = send_email_with_image(_email, path)
-                if res != "OK":
-                    messagebox.showerror(title="Error al enviar el correo", message=res)
+                conn_msg = """Por el momento no hay conexión a internet, por favor registre su préstamo 
+                ingresando manualmente su boleta o solicite un reenvío del qr al método proporcionado"""
 
-            self.insert_user()
+            self.insert_user(conn_msg)
             self.root.destroy()
     
+
+    def send_qr(self, method, number, email, img_path):
+        if method == "Mensaje por Whatsapp":
+            send_img(img_path, number)
+        else:
+            res = send_email_with_image(email, img_path)
+            if res != "OK":
+                messagebox.showerror(title="Error al enviar el correo", message=res, parent=self.root)
+
 
     def validate_entries(self):
         _id = self.id.get()
@@ -230,7 +240,7 @@ class register_GUI():
         return err_msg
     
 
-    def insert_user(self):
+    def insert_user(self, conn_msg):
         _id = self.id.get()
         _phone_number = self.phone_number.get()
         _email = self.email.get()
@@ -245,10 +255,13 @@ class register_GUI():
         driver = db.DB_Driver()
         query_result = driver.create_new_user(params)
 
+        reg_msg = "Usuario registrado correctamente, su código QR ha sido enviado al teléfono o correo proporcionado."
+        if conn_msg != "":
+            reg_msg = "Usuario registrado correctamente, " + conn_msg
+
         if query_result == "OK":
-            messagebox.showinfo(title="Usuario registrado", 
-                                message="Usuario registrado correctamente, su código QR ha sido enviado al teléfono o correo proporcionado.")
+            messagebox.showinfo(title="Usuario registrado", message=reg_msg, parent=self.root)
         else:
-            messagebox.showerror(title="Error en el registro", message=query_result)
+            messagebox.showerror(title="Error en el registro", message=query_result, parent=self.root)
 
         driver.close_connection()

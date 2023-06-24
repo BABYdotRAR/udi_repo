@@ -3,6 +3,7 @@ import sys
 import env_variables as env
 
 from string_validator import extract_number
+from date_time_handler import get_start_of_week_datetime
 
 
 class DB_Driver:
@@ -61,6 +62,29 @@ class DB_Driver:
         self.conn.commit()
         return "OK"
     
+
+    def get_email_by_user_id(self, user_id):
+        self.conn.commit()
+        query = "SELECT usr_email FROM te_users WHERE usr_id = ?"
+        try:
+            self.cursor.execute(query, (user_id,))
+        except mariadb.Error as e:
+            return f"Error: {e}"
+        if self.cursor.rowcount == 0:
+            return "Error: Boleta no válida"
+        return self.cursor.fetchone()[0]
+
+
+    def update_email_by_user_id(self, user_id, new_email):
+        self.conn.commit()
+        query = "UPDATE te_users SET usr_email = ? WHERE usr_id = ?"
+        try:
+            self.cursor.execute(query, (new_email, user_id))
+        except mariadb.Error as e:
+            return f"Error: {e}"
+        self.conn.commit()
+        return "OK"
+        
 
     def start_loan(self, id_usr, id_srv, id_obj):
         try:
@@ -127,6 +151,17 @@ class DB_Driver:
         users_in_loan = [usr_id for usr_id in self.cursor]
         return users_in_loan
     
+
+    def get_loans_by_day_in_current_week(self, day_name, loan_type):
+        self.conn.commit()
+        week_start = get_start_of_week_datetime()
+        query = f'SELECT COUNT(*) FROM te_loans WHERE start_at > "{week_start}" AND day_name = ? AND service_id = ?'
+        try:
+            self.cursor.execute(query, (day_name, loan_type))
+        except mariadb.Error as e:
+            return f"Error: {e}"
+        return self.cursor.fetchone()[0]
+
 
     def close_connection(self):
         self.conn.close()

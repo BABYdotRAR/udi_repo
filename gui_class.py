@@ -8,14 +8,19 @@ import colors as color
 import db_driver as db
 import gui_register as reg
 import gui_loans_list as loans
+import graphs_factory as factory
+import gui_resend_qr as resend
+import gui_issue as report
 
 
 class GUI_UDI():
     def __init__(self):
         self.root = tk.Tk()
-
+        
+        self.config_menubar()
         self.config_root()
         self.driver = db.DB_Driver()
+        self.graphs = factory.Graph_Factory()
         self.init_fonts()
         self.init_string_vars()
 
@@ -24,11 +29,11 @@ class GUI_UDI():
 
         self.form_frame = self.create_frame(self.root, background_color=color.blue_ocean)
         self.init_dropdowns()
-        self.form_frame.pack(padx=10, pady=10, fill='x')
+        self.form_frame.pack(padx=10, pady=10, fill='both')
 
-        self.btns_frame = self.create_frame(self.root, background_color=color.blue_ocean)
+        self.btns_frame = self.create_frame(self.root, total_cols=4, background_color=color.blue_ocean)
         self.init_buttons()
-        self.btns_frame.pack(padx=10, pady=10, fill='y')
+        self.btns_frame.pack(padx=10, pady=10, fill='x')
 
         self.manual_reg_frame = self.create_frame(self.root, background_color=color.blue_ocean)
         self.init_manual_reg_widgets()
@@ -44,7 +49,28 @@ class GUI_UDI():
     def config_root(self):
         self.root.title("UDI ESIT")
         self.root.geometry("800x600")
-        self.root.config(bg=color.dark_blue)
+        self.root.config(bg=color.dark_blue, menu=self.menubar)
+
+
+    def config_menubar(self):
+        self.menubar = tk.Menu(self.root)
+        self.user_menu = tk.Menu(self.menubar, tearoff=False)
+        self.dev_menu = tk.Menu(self.menubar, tearoff=False)
+        self.report_menu = tk.Menu(self.menubar, tearoff=False)
+        self.menubar.add_cascade(label="Reporte", menu=self.report_menu)
+        self.menubar.add_cascade(label="Usuario", menu=self.user_menu)
+        self.menubar.add_cascade(label="Ayuda", menu=self.dev_menu)
+        self.user_menu.add_command(label="Reenviar QR", command=self.on_resend_qr)
+        self.report_menu.add_command(label="Ver estadísticas de hoy", command=self.on_show_current_daily_stats)
+        self.report_menu.add_command(label="Ver estadísticas semanales", command=self.on_show_current_week_stats)
+        self.report_menu.add_separator()
+        self.report_menu.add_command(label="Reporte semanal", command=self.command_test)
+        self.report_menu.add_command(label="Reporte mensual", command=self.command_test)
+        self.dev_menu.add_command(label="Reportar un problema con la aplicación", command=self.on_report)
+
+
+    def command_test(self):
+        messagebox.showinfo(title="En desarrollo", message="No disponible por el momento.\nEsta función se encuentra en desarrollo.")
 
 
     def create_frame(self, parent:tk.Frame, total_cols=3, background_color=color.dark_blue):
@@ -91,20 +117,20 @@ class GUI_UDI():
 
 
     def init_buttons(self):
-        self.continue_btn = self.create_button(self.btns_frame, self.on_continue, "Siguiente", self.gothic_ui_light_14_font)
-        self.continue_btn.grid(row=0, column=2, sticky=tk.W+tk.E, padx=20, pady=20)
+        self.continue_btn = self.create_button(self.form_frame, self.on_continue, "Siguiente", self.gothic_ui_light_14_font)
+        self.continue_btn.grid(row=3, column=2, sticky=tk.W+tk.E, padx=20, pady=20)
 
         self.close_btn = self.create_button(self.btns_frame, self.on_close, "Terminar préstamo", self.gothic_ui_light_14_font, text_color=color.white, background_color=color.aqua)
-        self.close_btn.grid(row=0, column=1, sticky=tk.W+tk.E, padx=20, pady=20)
+        self.close_btn.grid(row=1, column=1, sticky=tk.W+tk.E, padx=20, pady=20)
 
         self.register_btn = self.create_button(self.btns_frame, self.on_register, "Registrar nuevo usuari@", self.gothic_ui_light_14_font, text_color=color.white, background_color=color.aqua)
-        self.register_btn.grid(row=0, column=0, sticky=tk.W+tk.E, padx=20, pady=20)
+        self.register_btn.grid(row=1, column=0, sticky=tk.W+tk.E, padx=20, pady=20)
 
         self.current_loans_btn = self.create_button(self.btns_frame, self.on_current_loans, "Ver préstamos activos", self.gothic_ui_light_14_font, text_color=color.white, background_color=color.blue)
-        self.current_loans_btn.grid(row=1, column=1, sticky=tk.W+tk.E, padx=20, pady=20)
+        self.current_loans_btn.grid(row=1, column=2, sticky=tk.W+tk.E, padx=20, pady=20)
 
         self.refresh_btn = self.create_button(self.btns_frame, self.on_refresh, "Refrescar", self.gothic_ui_light_14_font, text_color=color.white, background_color=color.blue)
-        self.refresh_btn.grid(row=1, column=2, sticky=tk.W+tk.E, padx=20, pady=20)
+        self.refresh_btn.grid(row=1, column=3, sticky=tk.W+tk.E, padx=20, pady=20)
 
 
     def init_string_vars(self):
@@ -254,6 +280,22 @@ class GUI_UDI():
         messagebox.showinfo(title="Préstamo exitoso.", message="¡Listo! ;)\nInicia préstamo para: "+_usr_id)
 
 
+    def on_show_current_week_stats(self):
+        self.graphs.show_week_bar_graph()
+
+
+    def on_show_current_daily_stats(self):
+        self.graphs.show_daily_bar_graph()
+
+
+    def on_resend_qr(self):
+        resend.GUI_Resend_QR()
+
+
+    def on_report(self):
+        report.GUI_Issue()
+
+        
     def on_dropdown_changed(self, *args):
         if self.srv_var_flag == False:
             self.srv_var_flag = True
