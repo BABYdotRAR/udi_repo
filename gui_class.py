@@ -40,8 +40,8 @@ class GUI_UDI():
         self.init_manual_reg_widgets()
         self.manual_reg_frame.pack(padx=10, pady=10, fill='x')
 
-        self.info_label = self.create_label(self.root, "", self.gothic_ui_light_12_font)
-        self.info_label.pack(padx=10, pady=10, side="left")
+        self.info_label = self.create_label(self.root, "", self.gothic_ui_light_12_font, align="w")
+        self.info_label.pack(padx=10, pady=10, anchor="w")
 
         self.credits_label = self.create_label(self.root, "© 2023 Oscar López All rights Reserved",self.gothic_ui_light_10_font)
         self.credits_label.pack(padx=10, pady=10, side="bottom")
@@ -86,13 +86,14 @@ class GUI_UDI():
 
 
     def create_label(self, parent:tk.Frame, label_text:str, label_font:font, 
-                    text_color=color.white, background_color=color.dark_blue):
+                    text_color=color.white, background_color=color.dark_blue, align = "center"):
         lbl = tk.Label(
             parent,
             text=label_text,
             font=label_font,
             fg=text_color,
-            bg=background_color
+            bg=background_color,
+            anchor=align
         )
         return lbl
     
@@ -124,8 +125,8 @@ class GUI_UDI():
 
     def init_buttons(self):
         _continue_info = """Info: Solicita el préstamo en selección (botones morados), se abrirá una ventana con la webcam donde se deberá presentar
-        el código QR que se le asignó al usuario al momento de registrarse; en caso de no contar con éste se deberá registrar primero o solicitar 
-        unn reenvío si es que ya está registrado, finalmente, si no dispone de un medio para mostrar el QR pero ya se ha registrado en el sistema, 
+        el código QR que se le asignó al usuario al momento de registrarse; en caso de no contar con éste se deberá registrar primero o solicitar
+        unn reenvío si es que ya está registrado, finalmente, si no dispone de un medio para mostrar el QR pero ya se ha registrado en el sistema,
         podrá registrar su préstamo ingresando su boleta, solo deberá presionar la letra Q cuando se muestre la webcam."""
         self.continue_btn = self.create_button(self.form_frame, self.on_continue, "Siguiente", self.gothic_ui_light_14_font, lbl_hover_text=_continue_info)
         self.continue_btn.grid(row=3, column=2, sticky=tk.W+tk.E, padx=20, pady=20)
@@ -149,7 +150,7 @@ class GUI_UDI():
 
         _refresh_info = """Actualiza los datos del formulario (botones morados) en caso de que algún préstamo de proyector/control haya finalizado pero
         aún no sea visible el dispositivo en las opciones a la hora de solicitar el préstamo."""
-        self.refresh_btn = self.create_button(self.btns_frame, self.on_refresh, "Refrescar", self.gothic_ui_light_14_font, text_color=color.white, background_color=color.blue, lbl_hover_text=_register_info)
+        self.refresh_btn = self.create_button(self.btns_frame, self.on_refresh, "Refrescar", self.gothic_ui_light_14_font, text_color=color.white, background_color=color.blue, lbl_hover_text=_refresh_info)
         self.refresh_btn.grid(row=1, column=3, sticky=tk.W+tk.E, padx=20, pady=20)
 
 
@@ -349,7 +350,7 @@ class GUI_UDI():
 
 
     def on_button_hover(self, lbl_text):
-        self.info_label.config(text=lbl_text)
+        self.info_label.config(text=lbl_text, anchor="w")
 
 
     def validate_entries(self):
