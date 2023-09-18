@@ -30,6 +30,27 @@ class Graph_Factory:
         plt.show()
 
 
+    def show_loans_between_bar_graph(self, start_at, end_at):
+        retriever = self.driver.get_loans_by_service_between(start_at, end_at, 1)
+        computer_loans = [retriever[day] if day in retriever else 0 for day in self.week_days]
+        retriever = self.driver.get_loans_by_service_between(start_at, end_at, 2)
+        projector_loans = [retriever[day] if day in retriever else 0 for day in self.week_days]
+        retriever = self.driver.get_loans_by_service_between(start_at, end_at, 3)
+        remote_control_loans = [retriever[day] if day in retriever else 0 for day in self.week_days]
+
+        x_indexes = np.arange(len(self.week_days))
+        bar_width = 0.25
+        plt.bar(x_indexes - bar_width, computer_loans, width=bar_width, label= "Computadoras")
+        plt.bar(x_indexes, projector_loans, width=bar_width, label= "Proyectores")
+        plt.bar(x_indexes + bar_width, remote_control_loans, width=bar_width, label= "Controles")
+        plt.xticks(ticks=x_indexes, labels=self.week_days)
+        plt.legend()
+
+        plt.title("Estadísticas de préstamo durante el mes de por día de la semana")
+        plt.xlabel("Día de la semana")
+        plt.ylabel("Total de préstamos")
+        plt.show()
+
     def show_daily_bar_graph(self):
         computer_loans = [self.driver.get_loans_by_day_in_current_week(get_current_day_name(), 1)]
         projector_loans = [self.driver.get_loans_by_day_in_current_week(get_current_day_name(), 2)]

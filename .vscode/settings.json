@@ -1,0 +1,8 @@
+{
+    "python.autoComplete.extraPaths": [
+        "C:\\Users\\tala_\\Documents\\ESCOM\\ss\\python\\udi_control_repo\\.venv\\Lib\\site-packages"
+    ],
+    "python.analysis.extraPaths": [
+        "C:\\Users\\tala_\\Documents\\ESCOM\\ss\\python\\udi_control_repo\\.venv\\Lib\\site-packages"
+    ]
+}

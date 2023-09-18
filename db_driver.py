@@ -86,6 +86,49 @@ class DB_Driver:
         return "OK"
         
 
+    def update_projector_status(self, projector_id, new_status):
+        self.conn.commit()
+        query = "UPDATE tc_projectors SET is_available = ? WHERE prjtr_id = ?"
+        try:
+            self.cursor.execute(query, (new_status, projector_id))
+        except mariadb.Error as e:
+            return f"Error: {e}"
+        self.conn.commit()
+        return "OK"
+
+
+    def update_remote_control_status(self, rmtctrl_id, new_status):
+        self.conn.commit()
+        query = "UPDATE tc_remote_controls SET is_available = ? WHERE rmtctrl_id = ?"
+        try:
+            self.cursor.execute(query, (new_status, rmtctrl_id))
+        except mariadb.Error as e:
+            return f"Error: {e}"
+        self.conn.commit()
+        return "OK"
+
+    def insert_remote_control(self, classroom):
+        self.conn.commit()
+        query = "INSERT INTO tc_remote_controls(rmtctrl_classroom, is_available) VALUES ('?', True)"
+        try:
+            self.cursor.execute(query, (classroom, ))
+        except mariadb.Error as e:
+            return f"Error: {e}"
+        self.conn.commit()
+        return "OK"
+    
+    
+    def insert_projector(self, prjtr_branch):
+        self.conn.commit()
+        query = "INSERT INTO tc_projectors(prjtr_branch, is_available) VALUES ('?', True)"
+        try:
+            self.cursor.execute(query, (prjtr_branch, ))
+        except mariadb.Error as e:
+            return f"Error: {e}"
+        self.conn.commit()
+        return "OK"
+    
+
     def start_loan(self, id_usr, id_srv, id_obj):
         try:
             self.cursor.execute("CALL insert_loan(?,?,?,@v)", (id_usr, id_srv, id_obj))
@@ -161,7 +204,44 @@ class DB_Driver:
         except mariadb.Error as e:
             return f"Error: {e}"
         return self.cursor.fetchone()[0]
+    
 
+    def get_loans_by_service_between(self, start_at, end_at, service_id) -> dict:
+        query = f'CALL get_total_loans_between(?,?,?)'
+        try:
+            self.cursor.execute(query, (start_at, end_at, service_id))
+        except mariadb.Error as e:
+            return f"Error: {e}"
+        fetched = self.cursor.fetchall()
+        return dict((row[0], row[1]) for row in fetched)
+
+
+    def get_total_loans_between(self, start_at, end_at):
+        query = """ SELECT
+        COUNT(*) AS record_count
+        FROM
+            te_loans
+        WHERE
+            start_at BETWEEN '?' AND '?';"""
+        try:
+            self.cursor.execute(query, (start_at, end_at))
+        except mariadb.Error as e:
+            return f"Error: {e}"
+        return self.cursor.fetchone()[0]
+    
+    def get_total_loans_by_service_between(self, start_at, end_at, service):
+        query = """ SELECT
+        COUNT(*) AS record_count
+        FROM
+            te_loans
+        WHERE
+            service_id = ? AND
+            start_at BETWEEN '?' AND '?';"""
+        try:
+            self.cursor.execute(query, (service, start_at, end_at))
+        except mariadb.Error as e:
+            return f"Error: {e}"
+        return self.cursor.fetchone()[0]
 
     def close_connection(self):
         self.conn.close()
