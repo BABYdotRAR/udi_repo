@@ -217,28 +217,17 @@ class DB_Driver:
 
 
     def get_total_loans_between(self, start_at, end_at):
-        query = """ SELECT
-        COUNT(*) AS record_count
-        FROM
-            te_loans
-        WHERE
-            start_at BETWEEN '?' AND '?';"""
+        query = """SELECT  COUNT(*) FROM  te_loans WHERE start_at BETWEEN '{}' AND '{}';""".format(start_at, end_at)
         try:
-            self.cursor.execute(query, (start_at, end_at))
+            self.cursor.execute(query)
         except mariadb.Error as e:
             return f"Error: {e}"
         return self.cursor.fetchone()[0]
     
-    def get_total_loans_by_service_between(self, start_at, end_at, service):
-        query = """ SELECT
-        COUNT(*) AS record_count
-        FROM
-            te_loans
-        WHERE
-            service_id = ? AND
-            start_at BETWEEN '?' AND '?';"""
+    def get_total_loans_by_service_between(self, start_at, end_at, service): 
+        query = """SELECT  COUNT(*) FROM  te_loans WHERE service_id = {} AND start_at BETWEEN '{}' AND '{}';""".format(service, start_at, end_at)
         try:
-            self.cursor.execute(query, (service, start_at, end_at))
+            self.cursor.execute(query)
         except mariadb.Error as e:
             return f"Error: {e}"
         return self.cursor.fetchone()[0]

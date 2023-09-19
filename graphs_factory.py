@@ -30,7 +30,7 @@ class Graph_Factory:
         plt.show()
 
 
-    def show_loans_between_bar_graph(self, start_at, end_at):
+    def create_loans_between_bar_graph(self, start_at, end_at, img_name):
         retriever = self.driver.get_loans_by_service_between(start_at, end_at, 1)
         computer_loans = [retriever[day] if day in retriever else 0 for day in self.week_days]
         retriever = self.driver.get_loans_by_service_between(start_at, end_at, 2)
@@ -49,7 +49,9 @@ class Graph_Factory:
         plt.title("Estadísticas de préstamo durante el mes de por día de la semana")
         plt.xlabel("Día de la semana")
         plt.ylabel("Total de préstamos")
-        plt.show()
+        
+        plt.savefig(img_name)
+        plt.close()
 
     def show_daily_bar_graph(self):
         computer_loans = [self.driver.get_loans_by_day_in_current_week(get_current_day_name(), 1)]
