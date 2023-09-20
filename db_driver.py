@@ -195,6 +195,14 @@ class DB_Driver:
         return users_in_loan
     
 
+    def get_last_loans(self):
+        query = f'SELECT * FROM last_loans'
+        try:
+            self.cursor.execute(query)
+        except mariadb.Error as e:
+            return f"Error: {e}"
+        return self.cursor.fetchall()
+
     def get_loans_by_day_in_current_week(self, day_name, loan_type):
         self.conn.commit()
         week_start = get_start_of_week_datetime()
@@ -210,6 +218,15 @@ class DB_Driver:
         query = f'CALL get_total_loans_between(?,?,?)'
         try:
             self.cursor.execute(query, (start_at, end_at, service_id))
+        except mariadb.Error as e:
+            return f"Error: {e}"
+        fetched = self.cursor.fetchall()
+        return dict((row[0], row[1]) for row in fetched)
+    
+    def get_loans_by_shift_and_service_between(self, start_at, end_at, service_id, shift) -> dict:
+        query = f'CALL get_loans_per_shift_between(?,?,?,?)'
+        try:
+            self.cursor.execute(query, (start_at, end_at, service_id, shift))
         except mariadb.Error as e:
             return f"Error: {e}"
         fetched = self.cursor.fetchall()

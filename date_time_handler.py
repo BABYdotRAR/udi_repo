@@ -15,6 +15,7 @@ def get_current_day_name():
 
 def get_month(month, year = 2023):
     start = datetime(year, month, 1).date()
-    end = (datetime(year, month + 1, 1) - timedelta(days=1)).date()
+    next_month = month + 1 if month < 12 else 1
+    end = (datetime(year, next_month, 1) - timedelta(days=1)).date()
     return [str(start), str(end)]
 

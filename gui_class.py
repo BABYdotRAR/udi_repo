@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import font
 from tkinter import messagebox
 
+from pdf_creator import create
 from qr_reader import get_data_from_qr
 from string_validator import extract_number
 from network_validator import has_connection_to_internet
@@ -61,6 +62,19 @@ class GUI_UDI():
         self.user_menu = tk.Menu(self.menubar, tearoff=False)
         self.dev_menu = tk.Menu(self.menubar, tearoff=False)
         self.report_menu = tk.Menu(self.menubar, tearoff=False)
+        self.monthly_report_menu = tk.Menu(self.report_menu, tearoff=False)
+        self.monthly_report_menu.add_command(label='Enero', command=lambda: create(1))
+        self.monthly_report_menu.add_command(label='Febrero', command=lambda: create(2))
+        self.monthly_report_menu.add_command(label='Marzo', command=lambda: create(3))
+        self.monthly_report_menu.add_command(label='Abril', command=lambda: create(4))
+        self.monthly_report_menu.add_command(label='Mayo', command=lambda: create(5))
+        self.monthly_report_menu.add_command(label='Junio', command=lambda: create(6))
+        self.monthly_report_menu.add_command(label='Julio', command=lambda: create(7))
+        self.monthly_report_menu.add_command(label='Agosto', command=lambda: create(8))
+        self.monthly_report_menu.add_command(label='Septiembre', command=lambda: create(9))
+        self.monthly_report_menu.add_command(label='Octubre', command=lambda: create(10))
+        self.monthly_report_menu.add_command(label='Noviembre', command=lambda: create(11))
+        self.monthly_report_menu.add_command(label='Diciembre', command=lambda: create(12))
         self.menubar.add_cascade(label="Reporte", menu=self.report_menu)
         self.menubar.add_cascade(label="Usuario", menu=self.user_menu)
         self.menubar.add_cascade(label="Ayuda", menu=self.dev_menu)
@@ -68,8 +82,7 @@ class GUI_UDI():
         self.report_menu.add_command(label="Ver estadísticas de hoy", command=self.on_show_current_daily_stats)
         self.report_menu.add_command(label="Ver estadísticas semanales", command=self.on_show_current_week_stats)
         self.report_menu.add_separator()
-        self.report_menu.add_command(label="Reporte semanal", command=self.command_test)
-        self.report_menu.add_command(label="Reporte mensual", command=self.command_test)
+        self.report_menu.add_cascade(menu=self.monthly_report_menu, label="Reporte mensual")
         self.dev_menu.add_command(label="Reportar un problema con la aplicación", command=self.on_report)
 
 

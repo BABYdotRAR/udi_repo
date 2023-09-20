@@ -53,6 +53,29 @@ class Graph_Factory:
         plt.savefig(img_name)
         plt.close()
 
+
+    def create_loans_per_shift_bar_graph(self, start_at, end_at, service, img_name):
+        services = {1:"Computadoras", 2:"Proyectores", 3:"Controles"}
+        retriever = self.driver.get_loans_by_shift_and_service_between(start_at, end_at, service, 'm')
+        morning_loans = [retriever[day] if day in retriever else 0 for day in self.week_days]
+        retriever = self.driver.get_loans_by_shift_and_service_between(start_at, end_at, service, 'v')
+        afternoon_loans = [retriever[day] if day in retriever else 0 for day in self.week_days]
+        
+        x_indexes = np.arange(len(self.week_days))
+        bar_width = 0.25
+        plt.bar(x_indexes - bar_width, morning_loans, width=bar_width, label= "Prestamos matutinos de {}".format(services[service]))
+        plt.bar(x_indexes, afternoon_loans, width=bar_width, label= "Prestamos vespertinos de {}".format(services[service]))
+        plt.xticks(ticks=x_indexes, labels=self.week_days)
+        plt.legend()
+
+        plt.title("Estadísticas de préstamo por turno en los días de la semana de {}".format(services[service]))
+        plt.xlabel("Día de la semana")
+        plt.ylabel("Total de préstamos")
+        
+        plt.savefig(img_name)
+        plt.close()
+
+
     def show_daily_bar_graph(self):
         computer_loans = [self.driver.get_loans_by_day_in_current_week(get_current_day_name(), 1)]
         projector_loans = [self.driver.get_loans_by_day_in_current_week(get_current_day_name(), 2)]
