@@ -10,6 +10,7 @@ import colors as color
 import db_driver as db
 import gui_register as reg
 import gui_loans_list as loans
+import gui_last_loans as ll
 import graphs_factory as factory
 import gui_resend_qr as resend
 import gui_issue as report
@@ -59,6 +60,7 @@ class GUI_UDI():
 
     def config_menubar(self):
         self.menubar = tk.Menu(self.root)
+        self.view_menu = tk.Menu(self.menubar, tearoff=False)
         self.user_menu = tk.Menu(self.menubar, tearoff=False)
         self.dev_menu = tk.Menu(self.menubar, tearoff=False)
         self.report_menu = tk.Menu(self.menubar, tearoff=False)
@@ -75,9 +77,11 @@ class GUI_UDI():
         self.monthly_report_menu.add_command(label='Octubre', command=lambda: create(10))
         self.monthly_report_menu.add_command(label='Noviembre', command=lambda: create(11))
         self.monthly_report_menu.add_command(label='Diciembre', command=lambda: create(12))
+        self.menubar.add_cascade(label="Ver", menu=self.view_menu)
         self.menubar.add_cascade(label="Reporte", menu=self.report_menu)
         self.menubar.add_cascade(label="Usuario", menu=self.user_menu)
         self.menubar.add_cascade(label="Ayuda", menu=self.dev_menu)
+        self.view_menu.add_command(label="Ver últimos reportes", command=self.on_view_last_loans)
         self.user_menu.add_command(label="Reenviar QR", command=self.on_resend_qr)
         self.report_menu.add_command(label="Ver estadísticas de hoy", command=self.on_show_current_daily_stats)
         self.report_menu.add_command(label="Ver estadísticas semanales", command=self.on_show_current_week_stats)
@@ -320,6 +324,10 @@ class GUI_UDI():
 
     def on_show_current_daily_stats(self):
         self.graphs.show_daily_bar_graph()
+
+
+    def on_view_last_loans(self):
+        ll.GUI_Last_Loans()
 
 
     def on_resend_qr(self):

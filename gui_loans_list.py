@@ -95,7 +95,7 @@ class GUI_Current_Loans:
         for v in tree_values:
             treeview.insert('', tk.END, values=v)
 
-        treeview.bind('<<TreeviewSelect>>', bind_action)
+        #treeview.bind('<<TreeviewSelect>>', bind_action)
         return treeview
 
 
@@ -146,19 +146,21 @@ class GUI_Current_Loans:
         self.computers_treeview.grid(row=1, column=0, sticky='nsew')
     
 
-    def control_item_selected(self, event):
+    def control_item_selected(self):
         for selected_item in self.controls_treeview.selection():
             item = self.controls_treeview.item(selected_item)
-            self.user_id_close_loan.append(item['values'][0]) 
+            self.user_id_close_loan.append(item['values'][0])
+        self.controls_treeview.selection_clear() 
     
 
-    def projectors_item_selected(self, event):
+    def projectors_item_selected(self):
         for selected_item in self.projectors_treeview.selection():
             item = self.projectors_treeview.item(selected_item)
             self.user_id_close_loan.append(item['values'][0]) 
+        self.projectors_treeview.selection_clear()
 
 
-    def computer_item_selected(self, event):
+    def computer_item_selected(self):
         for selected_item in self.computers_treeview.selection():
             item = self.computers_treeview.item(selected_item)
             self.user_id_close_loan.append(item['values'][0]) 
@@ -170,6 +172,9 @@ class GUI_Current_Loans:
 
 
     def on_close(self):
+        self.control_item_selected()
+        self.projectors_item_selected()
+        self.computer_item_selected()
         if self.user_id_close_loan:
             for _id in self.user_id_close_loan:
                 self.close_loan(_id)

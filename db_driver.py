@@ -201,7 +201,7 @@ class DB_Driver:
             self.cursor.execute(query)
         except mariadb.Error as e:
             return f"Error: {e}"
-        return self.cursor.fetchall()
+        return [(boleta, nombre, inicio, estado, dispositivo) for boleta, nombre, inicio, estado, dispositivo in self.cursor]
 
     def get_loans_by_day_in_current_week(self, day_name, loan_type):
         self.conn.commit()
